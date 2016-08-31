@@ -1,0 +1,7 @@
+name = FTS prices mass edit
+description = Массовае редактирование цен
+package = FTS
+core = 7.x
+configure = admin/config/my_percentage
+
+

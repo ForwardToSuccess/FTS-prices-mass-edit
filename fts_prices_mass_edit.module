@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * A light-weight, customizable lightbox plugin for jQuery 1.3
+ */
+
+function fts_prices_mass_edit_action_info(){
+  return array(
+    'calc_price' => array(
+      'type' => 'commerce_product',
+      'label' => t('Пересчитать цену'),
+      'configurable' => TRUE,
+    ),
+  );
+}
+
+// функция отвечающая за пересчет, дополнительные параметры из формы передаются в $context
+function calc_price($node, $context = array()) {
+  $context['oper']=str_replace(',', '.', $context['oper']);
+  $op='return '.$node->commerce_price['und'][0]['amount'].($context['oper']).';';
+  $res=eval($op);
+  $node->commerce_price['und'][0]['amount']=round($res);
+  commerce_product_save($node);
+}
+
+// форма ввода дополнительных данных ( к имени функции добавлен префикс '_form' )
+function calc_price_form($context) {
+  $form = array();
+  $form['oper'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Введите опреацию',
+    '#description' => 'Допустимы арифметические операции с числами. Пример записи "+10", "-11.5", "*0.95", "/2"',
+  );
+  return $form;
+}
+
+// сабмит формы дополнительных данных ( к имени функции добавлен префикс '_submit' )
+function calc_price_submit($form, $form_state) {
+  return array('oper' => $form_state['values']['oper']);
+}
+
+// также возможна валидация формы ( к имени функции добавлен префикс '_validate' )
+function calc_price_validate($form, $form_state) {
+$op='return 1'.($form_state['values']['oper']).';';
+$res=eval($op);
+}
